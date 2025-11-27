@@ -184,14 +184,29 @@ class ObsidianAPIClient:
         Raises:
             httpx.HTTPStatusError: If the request fails
         """
+        headers = self.headers.copy()
+        headers["Accept"] = "application/vnd.olrapi.note+json"
+
         async with httpx.AsyncClient(verify=False) as client:
             response = await client.get(
                 f"{self.base_url}/active/",
-                headers=self.headers,
+                headers=headers,
                 timeout=self.timeout
             )
+            
+            if response.status_code == 404:
+                return None
+                
             response.raise_for_status()
-            return response.json()
+            
+            if response.status_code == 204:
+                return None
+                
+            try:
+                return response.json()
+            except ValueError:
+                # If response is not JSON (e.g. empty body but 200 OK), return None
+                return None
 
     async def open_file(self, file_path: str, new_leaf: bool = False) -> Dict[str, Any]:
         """Open a file in Obsidian.

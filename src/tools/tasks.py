@@ -198,6 +198,9 @@ def filter_tasks(
     due_before: Optional[date] = None,
     due_after: Optional[date] = None,
     due_within_days: Optional[int] = None,
+    scheduled_before: Optional[date] = None,
+    scheduled_after: Optional[date] = None,
+    scheduled_within_days: Optional[int] = None,
     has_recurrence: Optional[bool] = None,
     tag: Optional[str] = None,
 ) -> List[Task]:
@@ -210,6 +213,9 @@ def filter_tasks(
         due_before: Filter tasks due before this date
         due_after: Filter tasks due after this date
         due_within_days: Filter tasks due within N days from today
+        scheduled_before: Filter tasks scheduled before this date
+        scheduled_after: Filter tasks scheduled after this date
+        scheduled_within_days: Filter tasks scheduled within N days from today
         has_recurrence: Filter tasks with/without recurrence
         tag: Filter tasks containing this tag
 
@@ -239,6 +245,21 @@ def filter_tasks(
             t
             for t in filtered
             if t.due_date and date.today() <= t.due_date <= cutoff_date
+        ]
+
+    # Scheduled date filters
+    if scheduled_before:
+        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date < scheduled_before]
+
+    if scheduled_after:
+        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date > scheduled_after]
+
+    if scheduled_within_days is not None:
+        cutoff_date = date.today() + timedelta(days=scheduled_within_days)
+        filtered = [
+            t
+            for t in filtered
+            if t.scheduled_date and date.today() <= t.scheduled_date <= cutoff_date
         ]
 
     # Recurrence filter
@@ -403,7 +424,7 @@ async def search_tasks_fs_tool(
 
     Args:
         vault_path: Path to vault (defaults to OBSIDIAN_VAULT_PATH env var)
-        filters: Filter criteria (status, priority, due_before, due_after, due_within_days, has_recurrence, tag)
+        filters: Filter criteria (status, priority, due_before, due_after, due_within_days, scheduled_before, scheduled_after, scheduled_within_days, has_recurrence, tag)
         limit: Maximum number of results to return
         sort_by: Field to sort by
         sort_order: Sort direction
@@ -428,6 +449,12 @@ async def search_tasks_fs_tool(
             filter_args["due_after"] = datetime.strptime(filters["due_after"], "%Y-%m-%d").date()
         if "due_within_days" in filters:
             filter_args["due_within_days"] = filters["due_within_days"]
+        if "scheduled_before" in filters:
+            filter_args["scheduled_before"] = datetime.strptime(filters["scheduled_before"], "%Y-%m-%d").date()
+        if "scheduled_after" in filters:
+            filter_args["scheduled_after"] = datetime.strptime(filters["scheduled_after"], "%Y-%m-%d").date()
+        if "scheduled_within_days" in filters:
+            filter_args["scheduled_within_days"] = filters["scheduled_within_days"]
         if "has_recurrence" in filters:
             filter_args["has_recurrence"] = filters["has_recurrence"]
         if "tag" in filters:

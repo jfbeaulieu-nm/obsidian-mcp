@@ -9,12 +9,14 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 ### Hybrid Architecture
 
 **Filesystem-Native Tools (33 tools)** - Work completely offline, no Obsidian required:
+
 - ✅ Direct file access for maximum performance
 - ✅ Zero Obsidian plugins needed
 - ✅ Instant startup, minimal memory
 - ✅ Full offline capability
 
 **API-Based Tools (12 tools)** - Enhanced features when Obsidian is running:
+
 - 🔌 Real-time workspace control
 - 🔌 Advanced plugin integration (Templater, Dataview DQL)
 - 🔌 Command palette access
@@ -25,26 +27,31 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 ## 📦 Complete Tool List (45 Tools)
 
 ### 🔗 Backlink Analysis (2 tools - Filesystem)
+
 - `get_backlinks_fs` - Find all notes linking to a specific note
 - `get_broken_links_fs` - Identify broken wikilinks in vault
 
 ### 🏷️ Tag Management (4 tools - Filesystem)
+
 - `analyze_note_tags_fs` - Extract frontmatter and inline tags
 - `add_tag_fs` - Add tags to note frontmatter
 - `remove_tag_fs` - Remove tags from frontmatter
 - `search_by_tag_fs` - Find notes by tag
 
 ### ✏️ Smart Content Insertion (4 tools - Filesystem)
+
 - `insert_after_heading_fs` - Insert content after specific headings
 - `insert_after_block_fs` - Insert after block references
 - `update_frontmatter_field_fs` - Update/add frontmatter fields
 - `append_to_note_fs` - Append content to note end
 
 ### 📊 Statistics & Analytics (2 tools - Filesystem)
+
 - `note_statistics_fs` - Comprehensive stats for individual notes
 - `vault_statistics_fs` - Aggregate vault statistics
 
 ### ✅ Tasks Plugin (5 tools - Filesystem)
+
 - `search_tasks` - Search tasks with emoji metadata (📅⏫🔁✅)
 - `create_task` - Create tasks with metadata
 - `toggle_task_status` - Toggle complete/incomplete
@@ -52,12 +59,14 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 - `get_task_statistics` - Task completion analytics
 
 ### 📊 Dataview Inline Fields (4 tools - Filesystem)
+
 - `extract_dataview_fields` - Parse all syntax variants (::, [], ())
 - `search_by_dataview_field` - Find notes by field values
 - `add_dataview_field` - Add inline fields
 - `remove_dataview_field` - Remove inline fields
 
 ### 📋 Kanban Boards (5 tools - Filesystem)
+
 - `parse_kanban_board` - Parse markdown Kanban structure
 - `add_kanban_card` - Add cards to columns
 - `move_kanban_card` - Move cards between columns
@@ -65,6 +74,7 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 - `get_kanban_statistics` - Board analytics
 
 ### 🔗 Enhanced Link Tracking (5 tools - Filesystem)
+
 - `get_link_graph` - Complete vault link graph
 - `find_orphaned_notes` - Identify isolated notes
 - `find_hub_notes` - Find highly connected notes
@@ -72,6 +82,7 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 - `get_note_connections` - Multi-level connection exploration
 
 ### 🎨 Canvas Files (5 tools - Filesystem)
+
 - `parse_canvas` - Parse JSON Canvas v1.0 files
 - `add_canvas_node` - Add text/file nodes
 - `add_canvas_edge` - Connect nodes with edges
@@ -79,22 +90,26 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 - `get_canvas_node_connections` - Analyze node relationships
 
 ### 📝 Templates (3 tools - Filesystem)
+
 - `expand_template` - Simple {{variable}} expansion
 - `create_note_from_template_fs` - Apply templates offline
 - `list_templates` - Browse available templates
 
 ### 🔌 Dataview Query API (4 tools - Requires Obsidian + Dataview)
+
 - `execute_dataview_query` - Execute full DQL queries (LIST/TABLE/TASK)
 - `list_notes_by_tag_dql` - DQL tag-based queries
 - `list_notes_by_folder_dql` - DQL folder queries
 - `table_query_dql` - Create tabular data views
 
 ### 🔌 Templater Plugin API (3 tools - Requires Obsidian + Templater)
+
 - `render_templater_template` - Dynamic template rendering
 - `create_note_from_template_api` - Create notes from Templater templates
 - `insert_templater_template` - Insert templates at cursor
 
 ### 🔌 Workspace Management (6 tools - Requires Obsidian)
+
 - `get_active_file` - Get currently active file
 - `open_file` - Open files in Obsidian
 - `close_active_file` - Close current file
@@ -103,6 +118,7 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 - `toggle_edit_mode` - Switch edit/preview mode
 
 ### 🔌 Command Execution (3 tools - Requires Obsidian)
+
 - `execute_command` - Run Obsidian commands
 - `list_commands` - List all available commands
 - `search_commands` - Search commands by name/ID
@@ -111,7 +127,41 @@ A comprehensive MCP server for Obsidian with **45 tools** across **hybrid filesy
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 🐳 Recommended: Docker Deployment (Easiest)
+
+For the easiest setup with automatic dependency management and isolation:
+
+```bash
+# Clone repository
+git clone https://github.com/aleksakarac/obsidian-mcp.git
+cd obsidian-mcp
+
+# Build Docker image
+./build.sh  # Linux/Mac
+# or
+build.bat   # Windows
+
+# Configure MCP client (see DOCKER.md for details)
+# Add to ~/.config/claude/claude_desktop_config.json or .roo/mcp.json
+```
+
+**Benefits:**
+
+- ✅ Zero local Python/uv setup required
+- ✅ Automatic dependency management
+- ✅ Isolated environment
+- ✅ Cross-platform compatibility
+- ✅ Easy updates
+
+📖 **[Complete Docker Setup Guide](DOCKER.md)**
+
+---
+
+### 🐍 Alternative: Local Python Setup
+
+If you prefer local Python development:
+
+#### Prerequisites
 
 ```bash
 # Python 3.11+ required
@@ -121,7 +171,7 @@ python --version
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Installation
+#### Installation
 
 ```bash
 # Clone repository
@@ -135,9 +185,9 @@ uv pip install .
 pip install .
 ```
 
-### Configuration
+#### Configuration
 
-#### For Filesystem-Only Tools (No Obsidian Required)
+##### For Filesystem-Only Tools (No Obsidian Required)
 
 Add to your Claude Code config (`~/.config/claude/claude_desktop_config.json`):
 
@@ -160,10 +210,11 @@ Add to your Claude Code config (`~/.config/claude/claude_desktop_config.json`):
 }
 ```
 
-#### For Full Hybrid Mode (Filesystem + API Tools)
+##### For Full Hybrid Mode (Filesystem + API Tools)
 
 1. Install [Local REST API plugin](https://github.com/coddingtonbear/obsidian-local-rest-api) in Obsidian
 2. Configure plugin settings:
+
    - Enable HTTPS: No (use HTTP for localhost)
    - API Key: Generate a secure key
    - Port: 27124 (default)
@@ -286,12 +337,14 @@ execute_command(command_id="editor:toggle-bold")
 ### Hybrid Design Philosophy
 
 **Filesystem-First Approach:**
+
 - Everything that CAN be filesystem-native, IS filesystem-native
 - Direct file access for reading/writing markdown
 - Zero dependencies on Obsidian plugins for core features
 - Full offline capability
 
 **API Enhancement:**
+
 - API tools complement filesystem tools
 - Provide features impossible without Obsidian (workspace UI, command execution)
 - Enable plugin integration (Templater, Dataview DQL)
@@ -307,11 +360,13 @@ execute_command(command_id="editor:toggle-bold")
 ### Performance
 
 **Filesystem Tools:**
+
 - 1,000 notes: < 3 seconds for full vault scans
 - Single note operations: < 100ms
 - Link graph generation: < 10 seconds for 1,000 notes
 
 **API Tools:**
+
 - Command execution: < 500ms
 - Query execution: Depends on Dataview plugin
 - Workspace operations: < 200ms
@@ -366,6 +421,7 @@ obsidian-mcp/
 ## 🤝 Contributing
 
 Contributions welcome! Please:
+
 1. Follow existing code style
 2. Add tests for new features
 3. Update documentation
@@ -389,6 +445,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## 📚 Additional Documentation
 
+- [DOCKER.md](DOCKER.md) - Docker deployment guide
 - [TESTING.md](TESTING.md) - Testing guide
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 - [README.upstream.md](README.upstream.md) - Original obsidian-mcp README

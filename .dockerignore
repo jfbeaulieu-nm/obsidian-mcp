@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation and specs (not needed in container)
+*.md
+specs/
+DOCKER.md
+README.upstream.md
+
+# Test files
+tests/
+.pytest_cache/
+.coverage
+coverage.json
+TESTING.md
+TEST_ENV_VARS.md
+
+# Development files
+uv.lock
+requirements.txt
+pyrightconfig.json
+.pre-commit-config.yaml
+
+# CI/CD
+.github/
+
+# Temporary files
+*.tmp
+*.log

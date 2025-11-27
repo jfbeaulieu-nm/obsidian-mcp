@@ -35,7 +35,7 @@ async def get_active_file() -> Dict[str, Any]:
     client = get_api_client()
 
     try:
-        result = await client.execute_command("app:get-active-file")
+        result = await client.get_active_file()
         return result
     except Exception as e:
         raise create_error(f"Failed to get active file: {str(e)}")
