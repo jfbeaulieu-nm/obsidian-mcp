@@ -2,7 +2,7 @@
 
 import os
 import httpx
-from typing import Annotated, Optional, List, Literal, Dict
+from typing import Annotated, Optional, List, Literal, Dict, Any
 from pydantic import Field
 from fastmcp import FastMCP
 from fastmcp.exceptions import McpError
@@ -65,7 +65,7 @@ from .tools.statistics import (
 
 # Tasks Plugin - Filesystem-native tools (User Story 1)
 from .tools.tasks import (
-    search_tasks_fs_tool,
+    search_tasks_fs_tool as _search_tasks_fs_tool,
     create_task_fs_tool,
     toggle_task_status_fs_tool,
     update_task_metadata_fs_tool,
@@ -515,6 +515,64 @@ async def create_folder_tool(
         raise handle_api_error(e)
     except Exception as e:
         raise create_error(f"Failed to create folder: {str(e)}")
+
+@mcp.tool()
+async def search_tasks_fs_tool(
+    vault_path: Annotated[Optional[str], Field(
+        description="Path to vault (defaults to OBSIDIAN_VAULT_PATH env var)",
+        default=None
+    )] = None,
+    filters: Annotated[Optional[Dict[str, Any]], Field(
+        description="Filter criteria. Supported keys: status (incomplete/completed/all), priority (highest/high/normal/low/lowest), due_before/due_after/due_within_days (YYYY-MM-DD or int), scheduled_before/scheduled_after/scheduled_within_days/scheduled_on (YYYY-MM-DD or int), has_recurrence (bool), tag (string), content (string)",
+        default=None,
+        examples=[{"status": "incomplete", "scheduled_on": "2025-01-01", "content": "meeting"}]
+    )] = None,
+    limit: Annotated[int, Field(
+        description="Maximum number of results to return",
+        ge=1,
+        le=1000,
+        default=100
+    )] = 100,
+    sort_by: Annotated[Literal["due_date", "priority", "file", "line_number"], Field(
+        description="Field to sort by",
+        default="due_date"
+    )] = "due_date",
+    sort_order: Annotated[Literal["asc", "desc"], Field(
+        description="Sort direction",
+        default="asc"
+    )] = "asc",
+    scheduled_on: Annotated[Optional[str], Field(
+        description="Filter tasks scheduled on this exact date (YYYY-MM-DD)",
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        default=None
+    )] = None,
+    ctx=None
+):
+    """
+    Search and filter tasks by metadata across the entire vault.
+
+    Args:
+        vault_path: Path to vault (defaults to OBSIDIAN_VAULT_PATH env var)
+        filters: Filter criteria (status, priority, due_before, due_after, due_within_days, scheduled_before, scheduled_after, scheduled_within_days, has_recurrence, tag)
+        limit: Maximum number of results to return
+        sort_by: Field to sort by
+        sort_order: Sort direction
+        scheduled_on: Filter tasks scheduled on this exact date (YYYY-MM-DD)
+
+    Returns:
+        Dictionary with tasks list, total count, and truncation flag
+    """
+    try:
+        # Add scheduled_on to filters if provided
+        if scheduled_on is not None:
+            if filters is None:
+                filters = {}
+            filters["scheduled_on"] = scheduled_on
+        return await _search_tasks_fs_tool(vault_path, filters, limit, sort_by, sort_order)
+    except ValueError as e:
+        raise create_error(str(e))
+    except Exception as e:
+        raise create_error(f"Task search failed: {str(e)}")
 
 @mcp.tool()
 async def move_folder_tool(
@@ -1602,6 +1660,22 @@ async def search_tasks_tool(
         ge=0,
         le=365
     )] = None,
+    scheduled_before: Annotated[Optional[str], Field(
+        description="Filter tasks scheduled before this date (YYYY-MM-DD)",
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$"
+    )] = None,
+    scheduled_after: Annotated[Optional[str], Field(
+        description="Filter tasks scheduled after this date (YYYY-MM-DD)",
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$"
+    )] = None,
+    scheduled_within_days: Annotated[Optional[int], Field(
+        description="Filter tasks scheduled within N days from today",
+        default=None,
+        ge=0,
+        le=365
+    )] = None,
     has_recurrence: Annotated[Optional[bool], Field(
         description="Filter tasks with/without recurrence patterns",
         default=None
@@ -1665,6 +1739,12 @@ async def search_tasks_tool(
             filters["due_after"] = due_after
         if due_within_days is not None:
             filters["due_within_days"] = due_within_days
+        if scheduled_before:
+            filters["scheduled_before"] = scheduled_before
+        if scheduled_after:
+            filters["scheduled_after"] = scheduled_after
+        if scheduled_within_days is not None:
+            filters["scheduled_within_days"] = scheduled_within_days
         if has_recurrence is not None:
             filters["has_recurrence"] = has_recurrence
         if tag:

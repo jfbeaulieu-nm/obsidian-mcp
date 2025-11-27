@@ -201,8 +201,10 @@ def filter_tasks(
     scheduled_before: Optional[date] = None,
     scheduled_after: Optional[date] = None,
     scheduled_within_days: Optional[int] = None,
+    scheduled_on: Optional[date] = None,
     has_recurrence: Optional[bool] = None,
     tag: Optional[str] = None,
+    content: Optional[str] = None,
 ) -> List[Task]:
     """Filter tasks by criteria.
 
@@ -216,8 +218,10 @@ def filter_tasks(
         scheduled_before: Filter tasks scheduled before this date
         scheduled_after: Filter tasks scheduled after this date
         scheduled_within_days: Filter tasks scheduled within N days from today
+        scheduled_on: Filter tasks scheduled on this exact date
         has_recurrence: Filter tasks with/without recurrence
         tag: Filter tasks containing this tag
+        content: Filter tasks containing this text in content (case-insensitive)
 
     Returns:
         Filtered list of tasks
@@ -249,10 +253,10 @@ def filter_tasks(
 
     # Scheduled date filters
     if scheduled_before:
-        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date < scheduled_before]
+        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date <= scheduled_before]
 
     if scheduled_after:
-        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date > scheduled_after]
+        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date >= scheduled_after]
 
     if scheduled_within_days is not None:
         cutoff_date = date.today() + timedelta(days=scheduled_within_days)
@@ -261,6 +265,9 @@ def filter_tasks(
             for t in filtered
             if t.scheduled_date and date.today() <= t.scheduled_date <= cutoff_date
         ]
+
+    if scheduled_on:
+        filtered = [t for t in filtered if t.scheduled_date and t.scheduled_date == scheduled_on]
 
     # Recurrence filter
     if has_recurrence is not None:
@@ -272,6 +279,11 @@ def filter_tasks(
     # Tag filter
     if tag:
         filtered = [t for t in filtered if tag in t.tags]
+
+    # Content filter
+    if content:
+        content_lower = content.lower()
+        filtered = [t for t in filtered if content_lower in t.content.lower()]
 
     return filtered
 
@@ -455,10 +467,14 @@ async def search_tasks_fs_tool(
             filter_args["scheduled_after"] = datetime.strptime(filters["scheduled_after"], "%Y-%m-%d").date()
         if "scheduled_within_days" in filters:
             filter_args["scheduled_within_days"] = filters["scheduled_within_days"]
+        if "scheduled_on" in filters:
+            filter_args["scheduled_on"] = datetime.strptime(filters["scheduled_on"], "%Y-%m-%d").date()
         if "has_recurrence" in filters:
             filter_args["has_recurrence"] = filters["has_recurrence"]
         if "tag" in filters:
             filter_args["tag"] = filters["tag"]
+        if "content" in filters:
+            filter_args["content"] = filters["content"]
 
     # Scan and filter
     all_tasks = scan_vault_for_tasks(vault)
