@@ -229,7 +229,13 @@ class ObsidianAPIClient:
                 timeout=self.timeout
             )
             response.raise_for_status()
-            return response.json()
+
+            # The open file endpoint may not return JSON, so handle gracefully
+            try:
+                return response.json()
+            except ValueError:
+                # If response is not JSON (e.g. empty body), return success status
+                return {"success": True, "message": f"File {file_path} opened successfully"}
 
     async def get_file(self, file_path: str) -> Dict[str, Any]:
         """Get file content via API.

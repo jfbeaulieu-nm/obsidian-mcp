@@ -59,13 +59,7 @@ async def open_file(file_path: str, new_leaf: bool = False) -> Dict[str, Any]:
     client = get_api_client()
 
     try:
-        result = await client.execute_command(
-            "app:open-file",
-            {
-                "file": file_path,
-                "newLeaf": new_leaf,
-            }
-        )
+        result = await client.open_file(file_path, new_leaf)
         return result
     except Exception as e:
         raise create_error(f"Failed to open file: {str(e)}")
