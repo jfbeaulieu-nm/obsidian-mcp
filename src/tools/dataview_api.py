@@ -5,10 +5,10 @@ Dataview plugin and Obsidian to be running. These complement the filesystem-nati
 Dataview field tools with full DQL query capabilities.
 
 DQL Queries supported:
-- LIST: Simple lists of pages
 - TABLE: Tabular data views
-- TASK: Task queries (different from Tasks plugin)
-- CALENDAR: Date-based views
+
+Note: The Obsidian Local REST API currently ONLY supports TABLE queries.
+LIST, TASK, and CALENDAR queries are NOT supported via the API.
 
 All tools require Obsidian with Dataview plugin running and API access.
 """
@@ -62,19 +62,16 @@ def validate_dql_query(query: str) -> bool:
         True if query appears valid, False otherwise
 
     Note:
-        This is basic validation - the Dataview plugin performs full validation.
+        The Obsidian Local REST API currently ONLY supports TABLE queries.
     """
     query = query.strip()
 
-    # Must start with a query type
-    valid_types = ["LIST", "TABLE", "TASK", "CALENDAR"]
-    starts_with_type = any(query.upper().startswith(t) for t in valid_types)
-
-    if not starts_with_type:
+    # Must start with TABLE
+    if not query.upper().startswith("TABLE"):
         return False
 
     # Basic sanity checks
-    if len(query) < 4:  # Minimum: "LIST"
+    if len(query) < 5:  # Minimum: "TABLE"
         return False
 
     return True
@@ -86,7 +83,9 @@ def build_dql_list_query(
     sort_clause: Optional[str] = None,
     limit: Optional[int] = None,
 ) -> str:
-    """Build a DQL LIST query from components.
+    """Build a DQL TABLE query that mimics a LIST query.
+
+    Since the API only supports TABLE queries, we use TABLE file.name to get a list of files.
 
     Args:
         from_clause: FROM clause (e.g., "#project", '"folder"')
@@ -95,13 +94,10 @@ def build_dql_list_query(
         limit: LIMIT value
 
     Returns:
-        Complete DQL query string
-
-    Examples:
-        >>> build_dql_list_query(from_clause="#project", where_clause="status = 'active'")
-        'LIST FROM #project WHERE status = 'active''
+        Complete DQL query string (using TABLE)
     """
-    parts = ["LIST"]
+    # Use TABLE file.name to get a list-like result
+    parts = ["TABLE file.name"]
 
     if from_clause:
         parts.append(f"FROM {from_clause}")
@@ -180,7 +176,10 @@ async def execute_dataview_query_api_tool(query: str) -> Dict[str, Any]:
     """
     # Validate query
     if not validate_dql_query(query):
-        raise ValueError(f"Invalid DQL query syntax: {query}")
+        raise ValueError(
+            f"Invalid DQL query syntax: {query}\n"
+            "Note: The Obsidian Local REST API currently ONLY supports TABLE queries."
+        )
 
     result = await execute_dataview_query(query)
 

@@ -205,6 +205,7 @@ def filter_tasks(
     has_recurrence: Optional[bool] = None,
     tag: Optional[str] = None,
     content: Optional[str] = None,
+    exclude_tags: Optional[List[str]] = None,
 ) -> List[Task]:
     """Filter tasks by criteria.
 
@@ -222,6 +223,7 @@ def filter_tasks(
         has_recurrence: Filter tasks with/without recurrence
         tag: Filter tasks containing this tag
         content: Filter tasks containing this text in content (case-insensitive)
+        exclude_tags: Filter tasks NOT containing these tags
 
     Returns:
         Filtered list of tasks
@@ -279,6 +281,13 @@ def filter_tasks(
     # Tag filter
     if tag:
         filtered = [t for t in filtered if tag in t.tags]
+
+    # Exclude tags filter
+    if exclude_tags:
+        filtered = [
+            t for t in filtered
+            if not any(ex_tag in t.tags for ex_tag in exclude_tags)
+        ]
 
     # Content filter
     if content:
@@ -436,7 +445,7 @@ async def search_tasks_fs_tool(
 
     Args:
         vault_path: Path to vault (defaults to OBSIDIAN_VAULT_PATH env var)
-        filters: Filter criteria (status, priority, due_before, due_after, due_within_days, scheduled_before, scheduled_after, scheduled_within_days, has_recurrence, tag)
+        filters: Filter criteria (status, priority, due_before, due_after, due_within_days, scheduled_before, scheduled_after, scheduled_within_days, has_recurrence, tag, content, exclude_tags)
         limit: Maximum number of results to return
         sort_by: Field to sort by
         sort_order: Sort direction
@@ -475,6 +484,8 @@ async def search_tasks_fs_tool(
             filter_args["tag"] = filters["tag"]
         if "content" in filters:
             filter_args["content"] = filters["content"]
+        if "exclude_tags" in filters:
+            filter_args["exclude_tags"] = filters["exclude_tags"]
 
     # Scan and filter
     all_tasks = scan_vault_for_tasks(vault)

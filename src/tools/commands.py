@@ -60,7 +60,7 @@ async def list_available_commands() -> List[Dict[str, Any]]:
     client = get_api_client()
 
     try:
-        result = await client.execute_command("app:list-commands")
+        result = await client.list_commands()
         return result
     except Exception as e:
         raise create_error(f"Failed to list commands: {str(e)}")
